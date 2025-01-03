@@ -22,17 +22,21 @@ def extrair_campos_e_formatar_reposta(response, retorno=False):
     """
 
     try:
+        print(f"Inicializando processamento de resposta: {response}")
         resposta_json = json.loads(response)
+        print(f"JSON decodificado: {resposta_json}")
     except json.JSONDecodeError:
         raise HTTPException(status_code=400, detail="Invalid JSON format.")
 
     resposta_do_modelo = resposta_json.get("generated_response")
+    print(f"Campo 'generated_response': {resposta_do_modelo}")
 
     if not resposta_do_modelo:
         raise HTTPException(status_code=400, detail="Missing 'generated_response' field in JSON.")
 
     # Parsear o XML
     root = ET.fromstring(resposta_do_modelo)
+    print(f"XML decodificado: {ET.tostring(root).decode()}")
 
     # Função recursiva para extrair tags e conteúdos
     def extract_tags(element):
@@ -46,9 +50,9 @@ def extrair_campos_e_formatar_reposta(response, retorno=False):
 
     # Extrair todas as tags e conteúdos
     campos_da_resposta_do_modelo = extract_tags(root)
+    print(f"Campos extraídos: {campos_da_resposta_do_modelo}")
 
     # Gerar a resposta_do_modelo_formatada com título e subtítulos
-
     resposta_do_modelo_formatada = "PARECER TÉCNICO\n\n"  # Título principal
     for chave, conteudo in campos_da_resposta_do_modelo.items():
         # Substituir "_" por espaço e capitalizar cada palavra para o subtítulo
@@ -59,8 +63,6 @@ def extrair_campos_e_formatar_reposta(response, retorno=False):
         return resposta_do_modelo_formatada, campos_da_resposta_do_modelo 
     else:
         return resposta_do_modelo_formatada
-
-
 
 
 # Define a data model for incoming POST requests
@@ -81,7 +83,7 @@ async def receive_lambda_response(response: LambdaResponse):
         dict: Confirmation message with received data.
     """
     try:
-        # Log ou processa os dados aqui
+        print(f"Payload recebido: {response.dict()}")
         print(extrair_campos_e_formatar_reposta(response.dict()))
 
         return {
