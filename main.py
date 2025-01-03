@@ -74,7 +74,7 @@ async def receive_lambda_response(response: LambdaResponse):
     """
     try:
         # Log or process the data here
-        print()
+        print(extrair_campos_e_formatar_reposta(response))
 
         return {
             "message": "Response received successfully.",
