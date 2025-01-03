@@ -21,8 +21,15 @@ def extrair_campos_e_formatar_reposta(response, retorno=False):
 
     """
 
-    resposta_json = json.loads(response)
-    resposta_do_modelo = resposta_json["generated_response"]
+    try:
+        resposta_json = json.loads(response)
+    except json.JSONDecodeError:
+        raise HTTPException(status_code=400, detail="Invalid JSON format.")
+
+    resposta_do_modelo = resposta_json.get("generated_response")
+
+    if not resposta_do_modelo:
+        raise HTTPException(status_code=400, detail="Missing 'generated_response' field in JSON.")
 
     # Parsear o XML
     root = ET.fromstring(resposta_do_modelo)
@@ -81,5 +88,7 @@ async def receive_lambda_response(response: LambdaResponse):
             "message": "Response received successfully.",
             "received": response.dict()
         }
+    except HTTPException as e:
+        raise e  # Lança o erro capturado para a API
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
