@@ -1,7 +1,8 @@
+import json
+import xml.etree.ElementTree as ET
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from typing import Optional
-import json
 
 # Define the FastAPI application
 app = FastAPI(title="Lambda Response Receiver API", description="API to receive and process results from AWS Lambda.")
