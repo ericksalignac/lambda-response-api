@@ -56,7 +56,7 @@ def extrair_campos_e_formatar_reposta(response, retorno=False):
 
 
 
-# Define the data model for incoming POST requests
+# Define a data model for incoming POST requests
 class LambdaResponse(BaseModel):
     id: str
     cd_occurrence: str
@@ -74,8 +74,8 @@ async def receive_lambda_response(response: LambdaResponse):
         dict: Confirmation message with received data.
     """
     try:
-        # Log or process the data here
-        print(extrair_campos_e_formatar_reposta(response))
+        # Log ou processa os dados aqui
+        print(extrair_campos_e_formatar_reposta(response.dict()))
 
         return {
             "message": "Response received successfully.",
