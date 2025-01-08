@@ -9,16 +9,18 @@ app = FastAPI(title="Lambda Response Receiver API", description="API to receive 
 class LambdaResponse(BaseModel):
     id: str
     cd_occurrence: str
-    status: str  # Adicionando o campo status, que será enviado pela Lambda
-    generated_response: str  # Adicionando o campo generated_response
-    generated_response_formatted: Optional[str] = None  # Se necessário, adicione como opcional
+    prompt: str  # Novo campo 'prompt' que será enviado pela Lambda
+    status: str  # Campo status, que será enviado pela Lambda
+    generated_response: str  # Campo generated_response, que será enviado pela Lambda
+    generated_response_formatted: Optional[str] = None  # Campo opcional generated_response_formatted
+    error: Optional[str] = None  # Campo opcional para erro, que pode ser enviado pela Lambda
 
 @app.post("/lambda-response")
 async def receive_lambda_response(response: LambdaResponse):
     """
     Endpoint to receive results from AWS Lambda.
     Args:
-        response (LambdaResponse): The payload containing id, cd_occurrence, generated_response, and status.
+        response (LambdaResponse): The payload containing id, cd_occurrence, prompt, generated_response, and status.
     Returns:
         dict: Confirmation message with received data.
     """
