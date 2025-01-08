@@ -1,11 +1,6 @@
 from fastapi import FastAPI
-import logging
 from pydantic import BaseModel
-from typing import Optional  # Garantir que Optional está sendo importado
-
-# Configurar logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+from typing import Optional
 
 # Define the FastAPI application
 app = FastAPI(title="Lambda Response Receiver API", description="API to receive and print results from AWS Lambda.")
@@ -18,7 +13,7 @@ class LambdaResponse(BaseModel):
     status: str
     generated_response: Optional[str] = None  # Agora é opcional
     generated_response_formatted: Optional[str] = None  # Agora é opcional
-    error: Optional[str] = None  # Agora é opcional
+    error: str = ""  # Definindo valor padrão de string vazia
 
 @app.post("/lambda-response")
 async def receive_lambda_response(response: LambdaResponse):
@@ -30,14 +25,11 @@ async def receive_lambda_response(response: LambdaResponse):
         dict: Confirmation message with received data.
     """
     try:
-        # Log the received data to console (or use logger)
-        logger.info("Received response: %s", response.dict())
-
-        # Optionally, you can print the response
+        # Print the received data
         print("Received response:", response.dict())
 
         # Return the exact data sent by the Lambda
         return response.dict()  # Return the response as is
     except Exception as e:
-        logger.error("Error processing the request: %s", str(e))
+        print(f"Error processing the request: {str(e)}")
         return {"error": "An error occurred while processing the request."}
