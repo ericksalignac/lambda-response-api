@@ -1,5 +1,5 @@
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
+from fastapi import FastAPI, HTTPException, Request
+from pydantic import BaseModel, Field
 from typing import Optional
 
 # Define the FastAPI application
@@ -14,6 +14,10 @@ class LambdaResponse(BaseModel):
     generated_response: str  # Campo generated_response, que será enviado pela Lambda
     generated_response_formatted: Optional[str] = None  # Campo opcional generated_response_formatted
     error: Optional[str] = None  # Campo opcional para erro, que pode ser enviado pela Lambda
+
+    class Config:
+        # Permite que qualquer chave adicional seja aceita no JSON
+        extra = "allow"
 
 @app.post("/lambda-response")
 async def receive_lambda_response(response: LambdaResponse):
@@ -32,3 +36,11 @@ async def receive_lambda_response(response: LambdaResponse):
         return response.dict()  # Retorna a resposta sem alterações
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
+
+# Caso haja algum erro no corpo da requisição, a resposta mostrará os detalhes
+@app.exception_handler(422)
+async def validation_exception_handler(request: Request, exc: HTTPException):
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={"message": "Erro de validação", "detail": exc.detail},
+    )
