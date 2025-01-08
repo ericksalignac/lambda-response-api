@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 import logging
 from pydantic import BaseModel
-from typing import Optional  # Adicionando a importação de Optional
+from typing import Optional  # Garantir que Optional está sendo importado
 
 # Configurar logging
 logging.basicConfig(level=logging.INFO)
@@ -14,11 +14,11 @@ app = FastAPI(title="Lambda Response Receiver API", description="API to receive 
 class LambdaResponse(BaseModel):
     id: str
     cd_occurrence: str
-    prompt: str
+    prompt: Optional[str] = None  # Agora é opcional
     status: str
-    generated_response: str
-    generated_response_formatted: Optional[str] = None  # Campo opcional
-    error: Optional[str] = None  # Campo opcional
+    generated_response: Optional[str] = None  # Agora é opcional
+    generated_response_formatted: Optional[str] = None  # Agora é opcional
+    error: Optional[str] = None  # Agora é opcional
 
 @app.post("/lambda-response")
 async def receive_lambda_response(response: LambdaResponse):
