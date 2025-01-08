@@ -1,6 +1,7 @@
 from fastapi import FastAPI, HTTPException, Request
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ValidationError
 from typing import Optional
+from fastapi.responses import JSONResponse
 
 # Define the FastAPI application
 app = FastAPI(title="Lambda Response Receiver API", description="API to receive and process results from AWS Lambda.")
@@ -39,8 +40,10 @@ async def receive_lambda_response(response: LambdaResponse):
 
 # Caso haja algum erro no corpo da requisição, a resposta mostrará os detalhes
 @app.exception_handler(422)
-async def validation_exception_handler(request: Request, exc: HTTPException):
+async def validation_exception_handler(request: Request, exc: ValidationError):
+    print("Validation error details:", exc.errors())  # Logando os detalhes do erro de validação
     return JSONResponse(
         status_code=exc.status_code,
-        content={"message": "Erro de validação", "detail": exc.detail},
+        content={"message": "Erro de validação", "detail": exc.errors()},
     )
+
