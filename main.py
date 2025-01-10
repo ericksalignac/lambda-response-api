@@ -33,3 +33,30 @@ async def receive_lambda_response(response: LambdaResponse):
     except Exception as e:
         print(f"Error processing the request: {str(e)}")
         return {"error": "An error occurred while processing the request."}
+
+
+class DlqLambdaResponse(BaseModel):
+    id: str
+    cd_occurrence: str
+    message: str
+
+@app.post("/lambda-dlq-response")
+async def receive_lambda_response(response: DlqLambdaResponse):
+    """
+    Endpoint to receive results from AWS Lambda and print them.
+    Args:
+        response (LambdaResponse): The payload containing id, cd_occurrence, prompt, generated_response, and status.
+    Returns:
+        dict: Confirmation message with received data.
+    """
+    try:
+        # Print the received data
+        print("Received response:", response.dict())
+
+        # Return the exact data sent by the Lambda
+        return response.dict()  # Return the response as is
+    except Exception as e:
+        print(f"Error processing the request: {str(e)}")
+        return {"error": "An error occurred while processing the request."}
+
+
